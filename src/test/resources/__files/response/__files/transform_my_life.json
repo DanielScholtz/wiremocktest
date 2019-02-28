@@ -1,0 +1,11 @@
+{
+  "response": {
+    "today": "{{now}}",
+    "today with year-month-day only": "{{now format='yyyy-MM-dd'}}",
+    "two years later march 22": "{{now offset='2 years' format='yyyy-03-22'}}",
+    "two years later march 22 epoch": "{{now offset='2 years' format='yyyy-03-22' format='epoch'}}",
+    "url request template": "{{request.url}}",
+    "port number": "{{request.requestLine.port}}",
+    "base URL": "{{request.requestLine.baseUrl}}"
+  }
+}

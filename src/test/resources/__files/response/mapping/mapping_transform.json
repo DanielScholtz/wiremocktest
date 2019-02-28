@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/transform/.*"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "transform_my_life.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}
