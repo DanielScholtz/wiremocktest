@@ -1,0 +1,13 @@
+<soap:Envelope
+        xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <soap:Body>
+        <ConversionRateResponse xmlns="http://www.webserviceX.NET/">
+            <ConversionRateResult>{{request.headers.exchangerate}}</ConversionRateResult>
+            <Date>{{now}}</Date>
+            <DateInEpoch>{{now format='epoch'}}</DateInEpoch>
+            <Date1YearLater>{{now offset='1 years'}}</Date1YearLater>
+        </ConversionRateResponse>
+    </soap:Body>
+</soap:Envelope>

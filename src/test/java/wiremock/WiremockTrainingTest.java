@@ -9,7 +9,7 @@ public abstract class WiremockTrainingTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(WiremockTrainingTest.class);
 
     protected static final int PORT = 8081;
-    protected static final String BASIC_PATH = "http://localhost:" + PORT;
+    protected static final String BASIC_PATH = "http://localhost:" + PORT + "/";
 
 
     protected void initializeRestAssuredHttp() {

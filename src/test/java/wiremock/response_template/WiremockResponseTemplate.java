@@ -22,11 +22,14 @@ import java.util.List;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static io.restassured.RestAssured.given;
+import static io.restassured.config.XmlConfig.xmlConfig;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasXPath;
 
 public class WiremockResponseTemplate extends WiremockTrainingTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WiremockResponseTemplate.class);
-    protected static final String FILE_PATH = "response/__files/";
+    protected static final String FILE_PATH = "response/";
 
     protected WireMockServer wireMockServer;
 
@@ -66,7 +69,7 @@ public class WiremockResponseTemplate extends WiremockTrainingTest {
                 get(urlPathEqualTo("/transform/"))
                         .withHeader(HttpHeaders.ACCEPT, equalTo(MediaType.APPLICATION_JSON_VALUE))
                         .willReturn(aResponse()
-                                .withBodyFile(FILE_PATH + "transform_my_life.json")
+                                .withBodyFile(FILE_PATH + "__files/transform_my_life.json")
                                 .withTransformers(theTemplateTransformerName)
                                 .withStatus(HttpStatus.OK.value())
                                 .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -78,7 +81,7 @@ public class WiremockResponseTemplate extends WiremockTrainingTest {
                 .contentType(ContentType.JSON)
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                .get(BASIC_PATH + "/transform/");
+                .get(BASIC_PATH + "transform/");
 
         theResponse
                 .then()
@@ -88,5 +91,53 @@ public class WiremockResponseTemplate extends WiremockTrainingTest {
         logResponseStatusHeadersAndBody(theResponse);
     }
 
+    @Test
+    public void xmlResponseTemplate() {
+        wireMockServer.stop();
+
+        final ResponseTemplateTransformer theTemplateTransformer =
+                new ResponseTemplateTransformer(false);
+        final String theTemplateTransformerName = theTemplateTransformer.getName();
+        wireMockServer = new WireMockServer(
+                WireMockConfiguration
+                        .options()
+                        .port(PORT)
+                        .extensions(theTemplateTransformer));
+        wireMockServer.start();
+
+        wireMockServer.stubFor(
+                get(urlEqualTo("/xml_transform/"))
+                        .withHeader(HttpHeaders.ACCEPT, equalTo(MediaType.APPLICATION_XML_VALUE))
+                        .willReturn(
+                                aResponse()
+                                        .withBodyFile(FILE_PATH + "__files/response_template_xml.xml")
+                                        .withTransformers(theTemplateTransformerName)
+                                        .withStatus(HttpStatus.OK.value())
+                                        .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE)
+                        )
+        );
+
+        String anythingYouWant = "test text";
+
+        final Response theResponse = given()
+                .config(RestAssured.config().xmlConfig(xmlConfig().with().namespaceAware(false)))
+                .contentType(ContentType.XML)
+                .accept(MediaType.APPLICATION_XML_VALUE)
+                .header("exchangerate", anythingYouWant)
+                .when()
+                .get(BASIC_PATH + "xml_transform/");
+
+        theResponse
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .contentType(ContentType.XML)
+                .body(
+                        hasXPath(
+                                "/Envelope/Body/ConversionRateResponse/ConversionRateResult",
+                                containsString(anythingYouWant))
+                );
+
+        logResponseStatusHeadersAndBody(theResponse);
+    }
 
 }
